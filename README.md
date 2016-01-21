@@ -5,6 +5,9 @@ modifications made by DGLogik (Apache). Thank you to Mr.doob as well as
 all contributors of three.js for sustaining the project and the editor. A list
 of three.js contributors can be found [here](https://github.com/mrdoob/three.js/graphs/contributors).
 
+The commit history for the project was not reproduced in the new git repository
+to prevent large project sizes when cloning.
+
 ---
 
 three.js
