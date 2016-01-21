@@ -1,0 +1,272 @@
+body {
+  font-family: 'Roboto', Helvetica, Arial, sans-serif !important;
+}
+
+.Outliner {
+  box-sizing: border-box;
+
+  width: 100%;
+  height: 140px;
+  padding: 4px;
+  overflow: auto;
+
+	outline: none;
+  background: #fff;
+  border-radius: 2px;
+
+	font-size: 12px;
+  color: #444;
+	cursor: default;
+
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+      0 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+.Outliner .option {
+	padding: 4px;
+	color: #666;
+	white-space: nowrap;
+}
+
+.Outliner .option.active {
+	background-color: #f8f8f8;
+}
+
+input.Number {
+  padding: 2px;
+
+  cursor: col-resize;
+	color: #0080f0 !important;
+
+	background-color: transparent !important;
+	border: 1px solid transparent;
+}
+
+#viewport {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+}
+
+#viewport #info {
+	text-shadow: 1px 1px 0px rgba(0,0,0,0.25);
+	pointer-events: none;
+}
+
+#script {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+
+	opacity: 0.9;
+}
+
+#player {
+	position: absolute;
+	top: 32px;
+	left: 0px;
+	right: 300px;
+	bottom: 32px;
+}
+
+#menubar {
+  box-sizing: border-box;
+	position: absolute;
+	right: 0px;
+	top: 0px;
+
+  width: 100%;
+  height: 42px;
+  padding: 0px;
+  padding-left: 8px;
+  margin: 0px;
+
+  background: #eee;
+}
+
+#menubar .menu {
+	float: left;
+	padding-right: 8px;
+
+  cursor: pointer;
+  line-height: 26px;
+}
+
+#menubar .menu.right {
+	float: right;
+	padding-right: 0px;
+
+  cursor: auto;
+	text-align: right;
+}
+
+#menubar .menu .title {
+	display: inline-block;
+  padding: 8px;
+	margin: 0px;
+
+  color: #888;
+}
+
+#menubar .menu .options {
+	position: absolute;
+	display: none;
+
+  width: 150px;
+	padding: 5px 0px;
+
+	background: white;
+  border-radius: 2px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+      0 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+#menubar .menu:hover .options {
+	display: block;
+}
+
+#menubar .menu .options hr {
+	border-color: #ddd;
+}
+
+#menubar .menu .options .option {
+  padding: 5px 10px;
+  margin: 0px !important;
+
+	color: #666;
+	background-color: transparent;
+}
+
+#menubar .menu .options .option:hover {
+  color: #fff;
+	background-color: #08f;
+}
+
+#menubar .menu .options .option:active {
+	color: #666;
+	background: transparent;
+}
+
+#sidebar {
+	position: absolute;
+	right: 0px;
+	top: 42px;
+	bottom: 0px;
+	width: 300px;
+
+	background: #eee;
+	overflow: auto;
+}
+
+#sidebar * {
+	vertical-align: middle;
+}
+
+#sidebar input,
+#sidebar textarea,
+#sidebar select {
+	border: 1px solid transparent;
+	color: #444;
+}
+
+#sidebar .Panel {
+	margin-bottom: 10px;
+}
+
+#sidebar .Panel.collapsed {
+	margin-bottom: 0px;
+}
+
+#sidebar > .Panel {
+  padding: 10px;
+  border-top: 1px solid #ccc;
+
+	color: #888;
+}
+
+#toolbar {
+  box-sizing: border-box;
+	position: absolute;
+	left: 0px;
+	right: 300px;
+	bottom: 0px;
+	height: 42px;
+
+  padding-left: 8px;
+
+  color: #333;
+  background: #eee;
+}
+
+#toolbar * {
+	vertical-align: middle;
+}
+
+#toolbar .Text {
+  line-height: 34px;
+}
+
+#toolbar .Panel {
+	padding: 4px;
+  color: #888;
+}
+
+#toolbar button {
+	margin-right: 6px;
+}
+
+button,
+input.Input {
+  border: 0;
+
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+
+  outline-color: transparent !important;
+  outline-style: none !important;
+}
+
+button,
+select,
+input.Input {
+  box-sizing: border-box;
+  height: 26px;
+
+  border-radius: 4px;
+  background-color: white;
+}
+
+.Static button,
+.Static select {
+  height: 20px;
+  transform: translateY(-2px);
+}
+
+select,
+input.Input {
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+      0 3px 1px -2px rgba(0, 0, 0, 0.2),
+      0 1px 5px 0 rgba(0, 0, 0, 0.12);
+}
+
+input.Input {
+  text-indent: 4px;
+}
+
+button {
+  color: white;
+  text-align: center;
+  background-color: #3498db;
+}
+
+button:hover,
+select:hover {
+  cursor: pointer;
+}
