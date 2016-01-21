@@ -214,10 +214,16 @@ Menubar.File = function ( editor ) {
 			});
 		});
 
-		dgframe.dashboard.exportIFrameDashboard(
-				'assets/index.html', editor.config.getKey('ui/sidebar/project/name'), values, zip.file.bind(zip));
+		var projectName = editor.config.getKey('ui/sidebar/project/name');
+		var symbolName = editor.config.getKey('ui/sidebar/data/name');
+		dgframe.dashboard.exportIFrameDashboard({
+			projectName: projectName,
+			symbolName: symbolName,
+			params: values,
+			callback: zip.file.bind(zip)
+		});
 
-		zip.file( 'assets/index.html', [
+		zip.file(projectName + '/assets/index.html', [
 
 			'<!DOCTYPE html>',
 			'<html lang="en">',
@@ -267,7 +273,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		zip.file( 'assets/app.json', output );
+		zip.file(projectName + '/assets/app.json', output );
 
 		//
 
@@ -280,22 +286,22 @@ Menubar.File = function ( editor ) {
 		var loader = new THREE.XHRLoader( manager );
 		loader.load( 'js/libs/app.js', function ( content ) {
 
-			zip.file( 'assets/js/app.js', content );
+			zip.file(projectName + '/assets/js/app.js', content );
 
 		} );
 
 		loader.load( 'js/libs/three.min.js', function ( content ) {
 
-			zip.file( 'assets/js/three.min.js', content );
+			zip.file(projectName + '/assets/js/three.min.js', content );
 
 		} );
 
 		loader.load('js/controls/OrbitControls.js', function(content) {
-			zip.file('assets/js/orbit.js', content);
+			zip.file(projectName + '/assets/js/orbit.js', content);
 		});
 
-		loader.load('js/libs/dgframe.js', function(content) {
-			zip.file('assets/js/dgframe.js', content);
+		loader.load('dgframe/index.js', function(content) {
+			zip.file(projectName + '/assets/js/dgframe.js', content);
 		});
 
 	} );

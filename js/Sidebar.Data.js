@@ -121,6 +121,17 @@ Sidebar.Data = function (editor) {
     container.add(row, rowFlexEnd);
   }
 
+  var srow = new UI.Panel();
+
+  srow.add(new UI.Text('Symbol Name').setWidth('90px').setClass('sidebar-data-title'));
+
+  var sinput = new UI.Input().setWidth('150px').onChange(function() {
+    config.setKey('ui/sidebar/data/name', sinput.getValue());
+  }).setValue(config.getKey('ui/sidebar/data/name'));
+  srow.add(sinput);
+
+  container.add(srow);
+
   var row = new UI.Panel();
 
   var input = new UI.Input().setValue("parameter").setWidth('150px');
