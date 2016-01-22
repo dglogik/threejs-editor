@@ -60,83 +60,14 @@ Menubar.File = function ( editor ) {
 
 	options.add( new UI.HorizontalRule() );
 
-	// Export Geometry
+	// Export JSON
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
-	option.setTextContent( 'Export Geometry' );
+	option.setTextContent( 'Export JSON' );
 	option.onClick( function () {
 
-		var object = editor.selected;
-
-		if ( object === null ) {
-
-			alert( 'No object selected.' );
-			return;
-
-		}
-
-		var geometry = object.geometry;
-
-		if ( geometry === undefined ) {
-
-			alert( 'The selected object doesn\'t have geometry.' );
-			return;
-
-		}
-
-		var output = geometry.toJSON();
-
-		try {
-			output = JSON.stringify( output, null, '\t' );
-			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-		} catch ( e ) {
-			output = JSON.stringify( output );
-		}
-
-		exportString( output, 'geometry.json' );
-
-	} );
-	options.add( option );
-
-	// Export Object
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Export Object' );
-	option.onClick( function () {
-
-		var object = editor.selected;
-
-		if ( object === null ) {
-
-			alert( 'No object selected' );
-			return;
-
-		}
-
-		var output = object.toJSON();
-
-		try {
-			output = JSON.stringify( output, null, '\t' );
-			output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
-		} catch ( e ) {
-			output = JSON.stringify( output );
-		}
-
-		exportString( output, 'model.json' );
-
-	} );
-	options.add( option );
-
-	// Export Scene
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Export Scene' );
-	option.onClick( function () {
-
-		var output = editor.scene.toJSON();
+		var output = editor.toJSON();
 
 		try {
 			output = JSON.stringify( output, null, '\t' );
@@ -149,47 +80,6 @@ Menubar.File = function ( editor ) {
 
 	} );
 	options.add( option );
-
-	// Export OBJ
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Export OBJ' );
-	option.onClick( function () {
-
-		var object = editor.selected;
-
-		if ( object === null ) {
-
-			alert( 'No object selected.' );
-			return;
-
-		}
-
-		var exporter = new THREE.OBJExporter();
-
-		exportString( exporter.parse( object ), 'model.obj' );
-
-	} );
-	options.add( option );
-
-	// Export STL
-
-	var option = new UI.Panel();
-	option.setClass( 'option' );
-	option.setTextContent( 'Export STL' );
-	option.onClick( function () {
-
-		var exporter = new THREE.STLExporter();
-
-		exportString( exporter.parse( editor.scene ), 'model.stl' );
-
-	} );
-	options.add( option );
-
-	//
-
-	options.add( new UI.HorizontalRule() );
 
 	// Publish
 

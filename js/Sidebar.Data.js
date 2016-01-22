@@ -86,6 +86,7 @@ Sidebar.Data = function (editor) {
     }
   }
 
+  var dataNames = {};
   function createData(name, valueConfig, typeConfig) {
     addParam(name);
     var row = new UI.Panel();
@@ -109,6 +110,7 @@ Sidebar.Data = function (editor) {
     removeButton.onClick(function() {
       deleteParam(name);
       container.remove(row, rowFlexEnd);
+      delete dataNames[name];
     });
 
     rowOptions.setClass('Panel sidebar-data-entry');
@@ -119,6 +121,7 @@ Sidebar.Data = function (editor) {
     rowFlexEnd.add(rowOptions);
 
     container.add(row, rowFlexEnd);
+    dataNames[name] = [row, rowFlexEnd];
   }
 
   var srow = new UI.Panel();
@@ -149,6 +152,33 @@ Sidebar.Data = function (editor) {
 
   dgframe.onReady(function() {
     Object.keys(params).forEach(function(key) {
+      var param = params[key];
+      createData(key, param.default, param.type);
+      updateData(key, param.default, param.type);
+    });
+  });
+
+  editor.signals.editorImported.add(function() {
+    sinput.setValue(config.getKey('ui/sidebar/data/name'));
+
+    var paramKeys = Object.keys(params);
+    var dataKeys = Object.keys(dataNames);
+
+    dataKeys.forEach(function(key) {
+      if(paramKeys.indexOf(key) > -1)
+        return;
+
+      var arr = dataNames[key];
+
+      container.remove(arr[0], arr[1]);
+      delete dataNames[key];
+    });
+
+    dataKeys = Object.keys(dataNames);
+    console.log(dataKeys);
+    paramKeys.forEach(function(key) {
+      if(dataKeys.indexOf(key) > -1)
+        return;
       var param = params[key];
       createData(key, param.default, param.type);
       updateData(key, param.default, param.type);

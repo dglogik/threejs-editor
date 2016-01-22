@@ -153,6 +153,13 @@ Sidebar.Project = function ( editor ) {
 
 	container.add(orbitRow);
 
+	editor.signals.editorImported.add(function() {
+		vr.setValue(config.getKey('project/vr'));
+		orbit.setValue(config.getKey('project/orbit'));
+		input.setValue(config.getKey('ui/sidebar/project/name'));
+		rendererShadows.setValue(config.getKey('project/renderer/shadows'));
+	});
+
 	//
 
 	function updateRenderer() {

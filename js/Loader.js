@@ -495,6 +495,11 @@ var Loader = function ( editor ) {
 
 			}, '' );
 
+		} else if (data.metadata.type.toLowerCase() === 'editor') {
+			if (confirm('Any unsaved data will be lost. Are you sure?')) {
+				editor.clear();
+				editor.fromJSON(data);
+			}
 		}
 
 	};

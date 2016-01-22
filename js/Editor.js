@@ -24,6 +24,7 @@ var Editor = function () {
 		// notifications
 
 		editorCleared: new SIGNALS.Signal(),
+		editorImported: new SIGNALS.Signal(),
 
 		savingStarted: new SIGNALS.Signal(),
 		savingFinished: new SIGNALS.Signal(),
@@ -455,17 +456,40 @@ Editor.prototype = {
 		this.setScene( loader.parse( json.scene ) );
 		this.scripts = json.scripts;
 
+		Object.keys(json.project).forEach(function(config) {
+			this.config.setKey(config, json.project[config]);
+		}.bind(this));
+
+		this.signals.editorImported.dispatch();
 	},
 
 	toJSON: function () {
+		var configNames = [
+			'project/renderer/shadows',
+			'project/vr',
+			'project/orbit',
+			'ui/sidebar/data/params',
+			'ui/sidebar/project/name',
+			'ui/sidebar/data/name'
+		];
+		var map = {};
+
+		configNames.forEach(function(config) {
+			map[config] = this.config.getKey(config);
+		}.bind(this));
 
 		return {
-
-			project: {
+			metadata: {
+				type: 'editor'
+			},
+			/*
+			{
 				shadows: this.config.getKey( 'project/renderer/shadows' ),
 				vr: this.config.getKey( 'project/vr' ),
 				orbit: this.config.getKey('project/orbit')
 			},
+		   */
+			project: map,
 			camera: this.camera.toJSON(),
 			scene: this.scene.toJSON(),
 			scripts: this.scripts

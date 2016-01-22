@@ -22,13 +22,13 @@ var APP = {
 
 		this.load = function ( json ) {
 
-			vr = json.project.vr;
-			orbit = json.project.orbit;
+			vr = json.project['project/vr'];
+			orbit = json.project['project/orbit'];
 
 			renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true } );
 			renderer.setClearColor( 0x000000, window.isThreeEditor ? 1.0 : 0 );
 			renderer.setPixelRatio( window.devicePixelRatio );
-			if ( json.project.shadows ) renderer.shadowMap.enabled = true;
+			if ( json.project['project/renderer/shadows'] ) renderer.shadowMap.enabled = true;
 			this.dom = renderer.domElement;
 
 			this.setScene( loader.parse( json.scene ) );
