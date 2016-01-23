@@ -459,8 +459,6 @@ Editor.prototype = {
 		Object.keys(json.project).forEach(function(config) {
 			this.config.setKey(config, json.project[config]);
 		}.bind(this));
-
-		this.signals.editorImported.dispatch();
 	},
 
 	toJSON: function () {

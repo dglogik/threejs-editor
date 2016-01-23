@@ -499,6 +499,7 @@ var Loader = function ( editor ) {
 			if (confirm('Any unsaved data will be lost. Are you sure?')) {
 				editor.clear();
 				editor.fromJSON(data);
+				editor.signals.editorImported.dispatch();
 			}
 		}
 

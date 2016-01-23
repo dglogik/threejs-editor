@@ -26,9 +26,9 @@ Sidebar.Data = function (editor) {
     dynamic: 'dynamic'
   };
 
-  var params = config.getKey(paramsKey);
-
   function addParam(name) {
+    var params = config.getKey(paramsKey);
+
     if(params[name])
       return;
 
@@ -41,6 +41,8 @@ Sidebar.Data = function (editor) {
   }
 
   function updateParam(name, key, value) {
+    var params = config.getKey(paramsKey);
+
     if(!params[name])
       return;
     params[name][key] = value;
@@ -48,6 +50,8 @@ Sidebar.Data = function (editor) {
   }
 
   function deleteParam(name) {
+    var params = config.getKey(paramsKey);
+
     if(!params[name])
       return;
     delete params[name];
@@ -151,6 +155,8 @@ Sidebar.Data = function (editor) {
   container.add(row);
 
   dgframe.onReady(function() {
+    var params = config.getKey(paramsKey);
+
     Object.keys(params).forEach(function(key) {
       var param = params[key];
       createData(key, param.default, param.type);
@@ -159,6 +165,7 @@ Sidebar.Data = function (editor) {
   });
 
   editor.signals.editorImported.add(function() {
+    var params = config.getKey(paramsKey);
     sinput.setValue(config.getKey('ui/sidebar/data/name'));
 
     var paramKeys = Object.keys(params);
@@ -175,7 +182,6 @@ Sidebar.Data = function (editor) {
     });
 
     dataKeys = Object.keys(dataNames);
-    console.log(dataKeys);
     paramKeys.forEach(function(key) {
       if(dataKeys.indexOf(key) > -1)
         return;
