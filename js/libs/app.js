@@ -58,6 +58,10 @@ var APP = {
 			var scriptWrapResult =
 					JSON.stringify( scriptWrapResultObj ).replace( /\"/g, '' );
 
+			json.project['ui/sidebar/global_scripts/scripts'].forEach(function(script) {
+				(new Function(script.source).bind(window))();
+			});
+
 			for ( var uuid in json.scripts ) {
 
 				var object = scene.getObjectByProperty( 'uuid', uuid, true );

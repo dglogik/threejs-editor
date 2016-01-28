@@ -455,12 +455,6 @@ Editor.prototype = {
 
 		this.setScene( loader.parse( json.scene ) );
 		this.scripts = json.scripts;
-
-		Object.keys(json.project).forEach(function(config) {
-			this.config.setKey(config, json.project[config]);
-		}.bind(this));
-
-		this.signals.editorImported.dispatch();
 	},
 
 	toJSON: function () {
@@ -470,7 +464,8 @@ Editor.prototype = {
 			'project/orbit',
 			'ui/sidebar/data/params',
 			'ui/sidebar/project/name',
-			'ui/sidebar/data/name'
+			'ui/sidebar/data/name',
+			'ui/sidebar/global_scripts/scripts'
 		];
 		var map = {};
 

@@ -27,7 +27,10 @@ var Config = function () {
 		'ui/sidebar/data/collapsed': true,
 		'ui/sidebar/data/params': {},
 		'ui/sidebar/project/name': 'three.js',
-		'ui/sidebar/data/name': 'three'
+		'ui/sidebar/data/name': 'three',
+
+		'ui/sidebar/global_scripts/collapsed': true,
+		'ui/sidebar/global_scripts/scripts': [],
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {
@@ -55,7 +58,6 @@ var Config = function () {
 		},
 
 		setKey: function () { // key, value, key, value ...
-
 			for ( var i = 0, l = arguments.length; i < l; i += 2 ) {
 
 				storage[ arguments[ i ] ] = arguments[ i + 1 ];
