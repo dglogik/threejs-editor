@@ -298,3 +298,14 @@ var APP = {
 	}
 
 };
+
+// iOS8(+?) workaround
+// https://github.com/mrdoob/three.js/blob/master/examples/index.html#L492
+if(!window.isThreeEditor) {
+	if (/(iPad|iPhone|iPod)/g.test(navigator.userAgent)) {
+    window.addEventListener('load', function() {
+      window.innerWidth -= 10;
+      window.innerHeight -= 2;
+    });
+	}
+}
