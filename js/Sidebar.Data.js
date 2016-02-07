@@ -5,6 +5,7 @@
 Sidebar.Data = function (editor) {
   var collapsedKey = 'ui/sidebar/data/collapsed';
   var paramsKey = 'ui/sidebar/data/params';
+  var symbolKey = 'ui/sidebar/data/name';
 
 	var config = editor.config;
 	var signals = editor.signals;
@@ -26,6 +27,8 @@ Sidebar.Data = function (editor) {
     dynamic: 'dynamic'
   };
 
+  var updateProps;
+
   function addParam(name) {
     var params = config.getKey(paramsKey);
 
@@ -34,10 +37,12 @@ Sidebar.Data = function (editor) {
 
     params[name] = {
       type: 'string',
-      value: ''
+      'default': ''
     };
 
     config.setKey(paramsKey, params);
+    if(updateProps)
+      updateProps();
   }
 
   function updateParam(name, key, value) {
@@ -47,6 +52,8 @@ Sidebar.Data = function (editor) {
       return;
     params[name][key] = value;
     config.setKey(paramsKey, params);
+    if(updateProps)
+      updateProps();
   }
 
   function deleteParam(name) {
@@ -56,6 +63,8 @@ Sidebar.Data = function (editor) {
       return;
     delete params[name];
     config.setKey(paramsKey, params);
+    if(updateProps)
+      updateProps();
   }
 
   function updateData(name, value, type) {
@@ -90,105 +99,137 @@ Sidebar.Data = function (editor) {
     }
   }
 
-  var dataNames = {};
-  function createData(name, valueConfig, typeConfig) {
-    addParam(name);
-    var row = new UI.Panel();
-    var rowOptions = new UI.Panel();
-    var rowFlexEnd = new UI.Panel();
+  var DataComponent = React.createClass({
+    getInitialState: function() {
+      updateProps = function() {
+        this.setState({
+          params: config.getKey(paramsKey),
+          symbolName: config.getKey(symbolKey),
+          newParamName: this.state.newParamName
+        });
+      }.bind(this);
 
-    var type = new UI.Select().setOptions(options).setWidth('60px').onChange(function() {
-      updateParam(name, 'type', type.getValue());
-    }).setValue(typeConfig);
+      return {
+        params: config.getKey(paramsKey),
+        symbolName: config.getKey(symbolKey),
+        newParamName: 'parameter'
+      };
+    },
+    render: function() {
+      var parent = R('div');
 
-    var input = new UI.Input().setWidth('150px').onChange(function() {
-      var value = input.getValue();
-      updateData(name, value, type.getValue());
-    }).setValue(valueConfig);
+      parent.children([
+        R('div')
+          .children([
+            R('span')
+              .style('width', '90px')
+              .child('Symbol Name')
+              ('class', 'Text sidebar-data-title'),
+            R('input')
+              .style('width', '150px')
+              .style('marginLeft', '10px')
+              ('class', 'Input')
+              ('value', this.state.symbolName)
+              ('onKeyDown', function(e) { e.stopPropagation() })
+              ('onChange', function(e) {
+                config.setKey(symbolKey, e.target.value);
+                updateProps();
+              }),
+          ])
+          ('class', 'Panel'),
+        R('div')
+          .children([
+            R('input')
+              .style('width', '150px')
+              ('class', 'Input')
+              ('value', this.state.newParamName)
+              ('onKeyDown', function(e) { e.stopPropagation() })
+              ('onChange', function(e) {
+                this.state.newParamName = e.target.value;
+                updateProps();
+              }.bind(this)),
+            R('button')
+              .child('New')
+              .style('marginLeft', '10px')
+              ('class', 'Button')
+              ('onClick', function() {
+                addParam(this.state.newParamName);
+              }.bind(this))
+          ])
+          ('class', 'Panel sidebar-data-flex')
+      ]);
 
-    row.add(new UI.Text(name).setWidth('90px').setClass('sidebar-data-title'));
-    row.add(input);
+      Object.keys(this.state.params).forEach(function(key) {
+        var param = this.state.params[key];
 
-    var removeButton = new UI.Button('Remove').setMarginLeft('10px');
+        parent.child(
+          R('div').children([
+            R('div')
+              .children([
+                R('span')
+                  .style('width', '90px')
+                  .child(key),
+                R('input')
+                  .style('width', '150px')
+                  .style('marginLeft', '10px')
+                  ('class', 'Input')
+                  ('value', param.default)
+                  ('onKeyDown', function(e) { e.stopPropagation() })
+                  ('onChange', function(e) {
+                    updateData(key, e.target.value, param.type);
+                  })
+              ])
+              ('class', 'Panel'),
+            R('div')
+              .child(R('div')
+                .children([
+                  R('select')
+                    .children(Object.keys(options).map(function(opt) {
+                      return R('option')('value', opt).child(options[opt]);
+                    }))
+                    .style('width', '60px')
+                    ('value', param.type)
+                    ('onChange', function(e) {
+                      updateParam(key, 'type', e.target.value);
+                    }),
+                  R('button')
+                    .child('Remove')
+                    .style('marginLeft', '10px')
+                    ('class', 'Button')
+                    ('onClick', function() {
+                      deleteParam(key);
+                    })
+                ])
+                ('class', 'Panel sidebar-data-entry'))
+              ('class', 'Panel sidebar-data-flex-end')
+          ])
+        );
+      }.bind(this));
 
-    removeButton.onClick(function() {
-      deleteParam(name);
-      container.remove(row, rowFlexEnd);
-      delete dataNames[name];
-    });
-
-    rowOptions.setClass('Panel sidebar-data-entry');
-    rowOptions.add(type);
-    rowOptions.add(removeButton);
-
-    rowFlexEnd.setClass('Panel sidebar-data-flex-end');
-    rowFlexEnd.add(rowOptions);
-
-    container.add(row, rowFlexEnd);
-    dataNames[name] = [row, rowFlexEnd];
-  }
-
-  var srow = new UI.Panel();
-
-  srow.add(new UI.Text('Symbol Name').setWidth('90px').setClass('sidebar-data-title'));
-
-  var sinput = new UI.Input().setWidth('150px').onChange(function() {
-    config.setKey('ui/sidebar/data/name', sinput.getValue());
-  }).setValue(config.getKey('ui/sidebar/data/name'));
-  srow.add(sinput);
-
-  container.add(srow);
-
-  var row = new UI.Panel();
-
-  var input = new UI.Input().setValue("parameter").setWidth('150px');
-  var newButton = new UI.Button('New').setMarginLeft('10px');
-
-  newButton.onClick(function() {
-    createData(input.getValue(), '', 'string');
+      return parent.build();
+    }
   });
 
-  row.setClass('Panel sidebar-data-flex');
-  row.add(input);
-  row.add(newButton);
+  var panel = new UI.Panel();
+	React.render(R(DataComponent).build(),
+			panel.dom);
 
-  container.add(row);
+	container.add(panel);
 
   dgframe.onReady(function() {
-    var params = config.getKey(paramsKey);
-
-    Object.keys(params).forEach(function(key) {
-      var param = params[key];
-      createData(key, param.default, param.type);
-      updateData(key, param.default, param.type);
-    });
+    if(updateProps)
+      updateProps();
   });
 
   editor.signals.editorImported.add(function() {
-    var params = config.getKey(paramsKey);
-    sinput.setValue(config.getKey('ui/sidebar/data/name'));
+    if(updateProps)
+      updateProps();
+  });
 
-    var paramKeys = Object.keys(params);
-    var dataKeys = Object.keys(dataNames);
-
-    dataKeys.forEach(function(key) {
-      if(paramKeys.indexOf(key) > -1)
-        return;
-
-      var arr = dataNames[key];
-
-      container.remove(arr[0], arr[1]);
-      delete dataNames[key];
-    });
-
-    dataKeys = Object.keys(dataNames);
-    paramKeys.forEach(function(key) {
-      if(dataKeys.indexOf(key) > -1)
-        return;
-      var param = params[key];
-      createData(key, param.default, param.type);
-      updateData(key, param.default, param.type);
-    });
+  editor.signals.editorCleared.add(function() {
+    config.setKey(paramsKey, {});
+    if(updateProps)
+      updateProps();
   });
 
 	return container;

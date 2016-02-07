@@ -47,42 +47,45 @@ Sidebar.GlobalScripts = function ( editor ) {
 
 			thisScripts.forEach(function(script) {
 				scripts.children([
-					R('input')
-						.style('width', '130px')
-						.style('fontSize', '12px')
-						('value', script.name)
-						('class', 'Input')
-						('onChange', function(e) {
-							script.name = e.target.value;
-							updateScripts();
-						}.bind(this)),
-					R('button')
-						.style('marginLeft', '4px')
-						.child('Edit')
-						('class', 'button')
-						('onClick', function() {
-							signals.editScript.dispatch({
-								name: "global scripts"
-							}, script);
-						}),
-					R('button')
-						.style('marginLeft', '4px')
-						.child('Remove')
-						('class', 'button')
-						('onClick', function() {
-							if(confirm( 'Are you sure?' )) {
-								var index;
-								thisScripts.forEach(function(s, i) {
-									if(script === s) {
-										index = i;
+					R('div')
+						.children([
+							R('input')
+								.style('width', '130px')
+								.style('fontSize', '12px')
+								('value', script.name)
+								('class', 'Input')
+								('onKeyDown', function(e) { e.stopPropagation() })
+								('onChange', function(e) {
+									script.name = e.target.value;
+									updateScripts();
+								}.bind(this)),
+							R('button')
+								.style('marginLeft', '4px')
+								.child('Edit')
+								('class', 'Button')
+								('onClick', function() {
+									signals.editScript.dispatch({
+										name: "global scripts"
+									}, script);
+								}),
+							R('button')
+								.style('marginLeft', '4px')
+								.child('Remove')
+								('class', 'Button')
+								('onClick', function() {
+									if(confirm( 'Are you sure?' )) {
+										var index;
+										thisScripts.forEach(function(s, i) {
+											if(script === s) {
+												index = i;
+											}
+										});
+										thisScripts.splice(index, 1);
+										updateScripts();
 									}
-								});
-								thisScripts.splice(index, 1);
-								updateScripts();
-							}
-						}.bind(this)),
-					R('br')
-						('class', 'Break')
+								}.bind(this))
+						])
+						('class', 'Panel')
 				]);
 			}.bind(this));
 
@@ -106,6 +109,12 @@ Sidebar.GlobalScripts = function ( editor ) {
 	container.add(panel);
 
 	editor.signals.editorImported.add(function() {
+		if(updateProps)
+			updateProps();
+	});
+
+	editor.signals.editorCleared.add(function() {
+		editor.config.setKey(scriptsKey, []);
 		if(updateProps)
 			updateProps();
 	});
