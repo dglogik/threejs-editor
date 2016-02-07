@@ -12,6 +12,20 @@
 		<script src="js/libs/three.min.js"></script>
 		<script src="js/libs/system.min.js"></script>
 
+		<script>
+			// fix for ui-builder
+			window.module = {};
+		</script>
+
+		<script src="js/libs/react-lite.min.js"></script>
+		<script src="ui-builder/react/core.js"></script>
+
+		<script>
+			// ui-builder
+			window.R = window.module.exports(React, false).R;
+			delete window.module;
+		</script>
+
 		<script src="js/controls/EditorControls.js"></script>
 		<script src="js/controls/TransformControls.js"></script>
 

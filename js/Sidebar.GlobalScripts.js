@@ -19,75 +19,95 @@ Sidebar.GlobalScripts = function ( editor ) {
 
 	//
 
-	var scriptsContainer = new UI.Panel();
-	container.add( scriptsContainer );
+	var updateProps;
 
-	function addScript(script) {
-
-		var name = new UI.Input( script.name ).setWidth( '130px' ).setFontSize( '12px' );
-		name.onChange( function () {
-			script.name = this.getValue();
-			editor.config.setKey(scriptsKey, scripts);
-		} )
-		scriptsContainer.add( name );
-
-		var edit = new UI.Button( 'Edit' );
-		edit.setMarginLeft( '4px' );
-		edit.onClick( function () {
-
-			signals.editScript.dispatch({
-				name: "global scripts"
-			}, script);
-
-		} );
-		scriptsContainer.add( edit );
-
-		var b = new UI.Break();
-		var remove = new UI.Button( 'Remove' );
-		remove.setMarginLeft( '4px' );
-		remove.onClick( function () {
-
-			if ( confirm( 'Are you sure?' ) ) {
-				scriptsContainer.remove(name, edit, remove, b);
-
-				var index;
-				scripts.forEach(function(s, i) {
-					if(script === s) {
-						index = i;
-					}
+	var GlobalScriptsComponent = React.createClass({
+		updateScripts: function() {
+			editor.config.setKey(scriptsKey, this.state.scripts);
+			this.setState({
+				scripts: editor.config.getKey(scriptsKey)
+			});
+		},
+		getInitialState: function() {
+			updateProps = function() {
+				this.setState({
+					scripts: editor.config.getKey(scriptsKey)
 				});
-				scripts.splice(index, 1);
+			}.bind(this);
 
-				editor.config.setKey(scriptsKey, scripts);
-			}
+			return {
+				scripts: editor.config.getKey(scriptsKey)
+			};
+		},
+		render: function() {
+			var scripts = R('div')('class', 'Panel');
 
-		} );
-		scriptsContainer.add( remove, b );
-	}
+			var thisScripts = this.state.scripts;
+			var updateScripts = this.updateScripts;
 
-	var newScript = new UI.Button( 'New' );
-	newScript.onClick( function () {
-		var script = { name: '', source: "console.log('hello world!')" };
-		var scripts = editor.config.getKey(scriptsKey);
+			thisScripts.forEach(function(script) {
+				scripts.children([
+					R('input')
+						.style('width', '130px')
+						.style('fontSize', '12px')
+						('value', script.name)
+						('class', 'Input')
+						('onChange', function(e) {
+							script.name = e.target.value;
+							updateScripts();
+						}.bind(this)),
+					R('button')
+						.style('marginLeft', '4px')
+						.child('Edit')
+						('class', 'button')
+						('onClick', function() {
+							signals.editScript.dispatch({
+								name: "global scripts"
+							}, script);
+						}),
+					R('button')
+						.style('marginLeft', '4px')
+						.child('Remove')
+						('class', 'button')
+						('onClick', function() {
+							if(confirm( 'Are you sure?' )) {
+								var index;
+								thisScripts.forEach(function(s, i) {
+									if(script === s) {
+										index = i;
+									}
+								});
+								thisScripts.splice(index, 1);
+								updateScripts();
+							}
+						}.bind(this)),
+					R('br')
+						('class', 'Break')
+				]);
+			}.bind(this));
 
-		scripts.push(script);
-		editor.config.setKey(scriptsKey, scripts);
-		addScript(script);
-	} );
-	container.add( newScript );
+			scripts.child(R('button')
+				.child('New')
+				('onClick', function() {
+					var script = { name: '', source: "console.log('hello world!')" };
 
-	var scripts = editor.config.getKey(scriptsKey);
-	scripts.forEach(function(script) {
-		addScript(script);
+					thisScripts.push(script);
+					updateScripts();
+				}));
+
+			return scripts.build();
+		}
 	});
 
-	editor.signals.editorImported.add(function() {
-		scriptsContainer.clear();
+	var panel = new UI.Panel();
+	React.render(R(GlobalScriptsComponent).build(),
+			panel.dom);
 
-		var scripts = editor.config.getKey(scriptsKey);
-		scripts.forEach(function(script) {
-			addScript(script);
-		});
+	container.add(panel);
+
+	editor.signals.editorImported.add(function() {
+		if(updateProps)
+			updateProps();
 	});
 
 	editor.signals.scriptChanged.add(function() {
