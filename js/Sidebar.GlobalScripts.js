@@ -40,7 +40,7 @@ Sidebar.GlobalScripts = function ( editor ) {
 			};
 		},
 		render: function() {
-			var scripts = R('div')('class', 'Panel');
+			var scripts = R('div')('className', 'Panel');
 
 			var thisScripts = this.state.scripts;
 			var updateScripts = this.updateScripts;
@@ -53,7 +53,7 @@ Sidebar.GlobalScripts = function ( editor ) {
 								.style('width', '130px')
 								.style('fontSize', '12px')
 								('value', script.name)
-								('class', 'Input')
+								('className', 'Input')
 								('onKeyDown', function(e) { e.stopPropagation() })
 								('onChange', function(e) {
 									script.name = e.target.value;
@@ -62,7 +62,7 @@ Sidebar.GlobalScripts = function ( editor ) {
 							R('button')
 								.style('marginLeft', '4px')
 								.child('Edit')
-								('class', 'Button')
+								('className', 'Button')
 								('onClick', function() {
 									signals.editScript.dispatch({
 										name: "global scripts"
@@ -71,7 +71,7 @@ Sidebar.GlobalScripts = function ( editor ) {
 							R('button')
 								.style('marginLeft', '4px')
 								.child('Remove')
-								('class', 'Button')
+								('className', 'Button')
 								('onClick', function() {
 									if(confirm( 'Are you sure?' )) {
 										var index;
@@ -85,7 +85,7 @@ Sidebar.GlobalScripts = function ( editor ) {
 									}
 								}.bind(this))
 						])
-						('class', 'Panel')
+						('className', 'Panel')
 				]);
 			}.bind(this));
 

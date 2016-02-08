@@ -45,10 +45,10 @@ input.Number {
 
 #viewport {
 	position: absolute;
-	top: 32px;
+	top: 42px;
 	left: 0px;
 	right: 300px;
-	bottom: 32px;
+	bottom: 42px;
 }
 
 #viewport #info {
@@ -58,10 +58,10 @@ input.Number {
 
 #script {
 	position: absolute;
-	top: 32px;
+	top: 42px;
 	left: 0px;
 	right: 300px;
-	bottom: 32px;
+	bottom: 42px;
 
 	opacity: 0.9;
 }

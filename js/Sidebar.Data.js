@@ -124,11 +124,11 @@ Sidebar.Data = function (editor) {
             R('span')
               .style('width', '90px')
               .child('Symbol Name')
-              ('class', 'Text sidebar-data-title'),
+              ('className', 'Text sidebar-data-title'),
             R('input')
               .style('width', '150px')
               .style('marginLeft', '10px')
-              ('class', 'Input')
+              ('className', 'Input')
               ('value', this.state.symbolName)
               ('onKeyDown', function(e) { e.stopPropagation() })
               ('onChange', function(e) {
@@ -136,12 +136,12 @@ Sidebar.Data = function (editor) {
                 updateProps();
               }),
           ])
-          ('class', 'Panel'),
+          ('className', 'Panel'),
         R('div')
           .children([
             R('input')
               .style('width', '150px')
-              ('class', 'Input')
+              ('className', 'Input')
               ('value', this.state.newParamName)
               ('onKeyDown', function(e) { e.stopPropagation() })
               ('onChange', function(e) {
@@ -151,12 +151,12 @@ Sidebar.Data = function (editor) {
             R('button')
               .child('New')
               .style('marginLeft', '10px')
-              ('class', 'Button')
+              ('className', 'Button')
               ('onClick', function() {
                 addParam(this.state.newParamName);
               }.bind(this))
           ])
-          ('class', 'Panel sidebar-data-flex')
+          ('className', 'Panel sidebar-data-flex')
       ]);
 
       Object.keys(this.state.params).forEach(function(key) {
@@ -172,14 +172,14 @@ Sidebar.Data = function (editor) {
                 R('input')
                   .style('width', '150px')
                   .style('marginLeft', '10px')
-                  ('class', 'Input')
+                  ('className', 'Input')
                   ('value', param.default)
                   ('onKeyDown', function(e) { e.stopPropagation() })
                   ('onChange', function(e) {
                     updateData(key, e.target.value, param.type);
                   })
               ])
-              ('class', 'Panel'),
+              ('className', 'Panel'),
             R('div')
               .child(R('div')
                 .children([
@@ -195,13 +195,13 @@ Sidebar.Data = function (editor) {
                   R('button')
                     .child('Remove')
                     .style('marginLeft', '10px')
-                    ('class', 'Button')
+                    ('className', 'Button')
                     ('onClick', function() {
                       deleteParam(key);
                     })
                 ])
-                ('class', 'Panel sidebar-data-entry'))
-              ('class', 'Panel sidebar-data-flex-end')
+                ('className', 'Panel sidebar-data-entry'))
+              ('className', 'Panel sidebar-data-flex-end')
           ])
         );
       }.bind(this));
