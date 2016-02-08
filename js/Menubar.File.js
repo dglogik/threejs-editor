@@ -106,6 +106,7 @@ Menubar.File = function ( editor ) {
 
 		var projectName = editor.config.getKey('ui/sidebar/project/name');
 		var symbolName = editor.config.getKey('ui/sidebar/data/name');
+		
 		dgframe.dashboard.exportIFrameDashboard({
 			projectName: projectName,
 			symbolName: symbolName,
@@ -136,7 +137,7 @@ Menubar.File = function ( editor ) {
 			'		<script>',
 			'',
 			'			var loader = new THREE.XHRLoader();',
-			'			loader.load( \'app.json\', function ( text ) {',
+			'			loader.load( \'' + symbolName + '.json\', function ( text ) {',
 			'',
 			'				var player = new APP.Player();',
 			'				player.load( JSON.parse( text ) );',
@@ -163,7 +164,7 @@ Menubar.File = function ( editor ) {
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
-		zip.file(projectName + '/assets/app.json', output );
+		zip.file(projectName + '/assets/' + symbolName + '.json', output );
 
 		//
 
