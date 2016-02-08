@@ -98,6 +98,10 @@ var APP = {
 
 		};
 
+		this.getCamera = function() {
+			return camera;
+		};
+
 		this.setCamera = function ( value ) {
 
 			camera = value;
