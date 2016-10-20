@@ -18,7 +18,7 @@ Menubar.Help = function ( editor ) {
 
 	// Source code
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Source code' );
 	option.onClick( function () {
@@ -27,10 +27,8 @@ Menubar.Help = function ( editor ) {
 
 	} );
 	options.add( option );
-
-	//
-
-	options.add( new UI.HorizontalRule() );
+	
+	options.add(new UI.HorizontalRule());
 
 	// About (dglogik)
 

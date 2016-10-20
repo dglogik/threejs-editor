@@ -12,21 +12,36 @@ var Viewport = function ( editor ) {
 
 	container.add( new Viewport.Info( editor ) );
 
+	//
+
+	var renderer = null;
+
+	var camera = editor.camera;
 	var scene = editor.scene;
 	var sceneHelpers = editor.sceneHelpers;
 
 	var objects = [];
 
+	//
+
+	var vrEffect, vrControls;
+
+	if ( WEBVR.isAvailable() === true ) {
+
+		var vrCamera = new THREE.PerspectiveCamera();
+		vrCamera.projectionMatrix = camera.projectionMatrix;
+		camera.add( vrCamera );
+
+	}
+
 	// helpers
 
-	var grid = new THREE.GridHelper( 500, 25 );
+	var grid = new THREE.GridHelper( 30, 60 );
 	sceneHelpers.add( grid );
 
 	//
 
-	var camera = editor.camera;
-
-	//
+	var box = new THREE.Box3();
 
 	var selectionBox = new THREE.BoxHelper();
 	selectionBox.material.depthTest = false;
@@ -34,7 +49,9 @@ var Viewport = function ( editor ) {
 	selectionBox.visible = false;
 	sceneHelpers.add( selectionBox );
 
-	var matrix = new THREE.Matrix4();
+	var objectPositionOnDown = null;
+	var objectRotationOnDown = null;
+	var objectScaleOnDown = null;
 
 	var transformControls = new THREE.TransformControls( camera, container.dom );
 	transformControls.addEventListener( 'change', function () {
@@ -51,6 +68,8 @@ var Viewport = function ( editor ) {
 
 			}
 
+			signals.refreshSidebarObject3D.dispatch( object );
+
 		}
 
 		render();
@@ -60,7 +79,9 @@ var Viewport = function ( editor ) {
 
 		var object = transformControls.object;
 
-		matrix.copy( object.matrix );
+		objectPositionOnDown = object.position.clone();
+		objectRotationOnDown = object.rotation.clone();
+		objectScaleOnDown = object.scale.clone();
 
 		controls.enabled = false;
 
@@ -69,39 +90,49 @@ var Viewport = function ( editor ) {
 
 		var object = transformControls.object;
 
-		if ( matrix.equals( object.matrix ) === false ) {
+		if ( object !== undefined ) {
 
-			( function ( matrix1, matrix2 ) {
+			switch ( transformControls.getMode() ) {
 
-				editor.history.add(
-					function () {
-						matrix1.decompose( object.position, object.quaternion, object.scale );
-						signals.objectChanged.dispatch( object );
-					},
-					function () {
-						matrix2.decompose( object.position, object.quaternion, object.scale );
-						signals.objectChanged.dispatch( object );
+				case 'translate':
+
+					if ( ! objectPositionOnDown.equals( object.position ) ) {
+
+						editor.execute( new SetPositionCommand( object, object.position, objectPositionOnDown ) );
+
 					}
-				);
 
-			} )( matrix.clone(), object.matrix.clone() );
+					break;
+
+				case 'rotate':
+
+					if ( ! objectRotationOnDown.equals( object.rotation ) ) {
+
+						editor.execute( new SetRotationCommand( object, object.rotation, objectRotationOnDown ) );
+
+					}
+
+					break;
+
+				case 'scale':
+
+					if ( ! objectScaleOnDown.equals( object.scale ) ) {
+
+						editor.execute( new SetScaleCommand( object, object.scale, objectScaleOnDown ) );
+
+					}
+
+					break;
+
+			}
 
 		}
 
-		signals.objectChanged.dispatch( object );
 		controls.enabled = true;
 
 	} );
 
 	sceneHelpers.add( transformControls );
-
-	// fog
-
-	var oldFogType = "None";
-	var oldFogColor = 0xaaaaaa;
-	var oldFogNear = 1;
-	var oldFogFar = 5000;
-	var oldFogDensity = 0.00025;
 
 	// object picking
 
@@ -118,7 +149,7 @@ var Viewport = function ( editor ) {
 
 		return raycaster.intersectObjects( objects );
 
-	};
+	}
 
 	var onDownPosition = new THREE.Vector2();
 	var onUpPosition = new THREE.Vector2();
@@ -129,11 +160,11 @@ var Viewport = function ( editor ) {
 		var rect = dom.getBoundingClientRect();
 		return [ ( x - rect.left ) / rect.width, ( y - rect.top ) / rect.height ];
 
-	};
+	}
 
 	function handleClick() {
 
-		if ( onDownPosition.distanceTo( onUpPosition ) == 0 ) {
+		if ( onDownPosition.distanceTo( onUpPosition ) === 0 ) {
 
 			var intersects = getIntersects( onUpPosition, objects );
 
@@ -163,7 +194,7 @@ var Viewport = function ( editor ) {
 
 		}
 
-	};
+	}
 
 	function onMouseDown( event ) {
 
@@ -174,7 +205,7 @@ var Viewport = function ( editor ) {
 
 		document.addEventListener( 'mouseup', onMouseUp, false );
 
-	};
+	}
 
 	function onMouseUp( event ) {
 
@@ -185,7 +216,7 @@ var Viewport = function ( editor ) {
 
 		document.removeEventListener( 'mouseup', onMouseUp, false );
 
-	};
+	}
 
 	function onTouchStart( event ) {
 
@@ -196,7 +227,7 @@ var Viewport = function ( editor ) {
 
 		document.addEventListener( 'touchend', onTouchEnd, false );
 
-	};
+	}
 
 	function onTouchEnd( event ) {
 
@@ -209,7 +240,7 @@ var Viewport = function ( editor ) {
 
 		document.removeEventListener( 'touchend', onTouchEnd, false );
 
-	};
+	}
 
 	function onDoubleClick( event ) {
 
@@ -226,7 +257,7 @@ var Viewport = function ( editor ) {
 
 		}
 
-	};
+	}
 
 	container.dom.addEventListener( 'mousedown', onMouseDown, false );
 	container.dom.addEventListener( 'touchstart', onTouchStart, false );
@@ -252,25 +283,29 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	var clearColor;
+	signals.enterVR.add( function () {
+
+		vrEffect.isPresenting ? vrEffect.exitPresent() : vrEffect.requestPresent();
+
+	} );
 
 	signals.themeChanged.add( function ( value ) {
 
 		switch ( value ) {
 
 			case 'css/light.css':
-			case 'css/visualizer.css':
-				grid.setColors( 0x444444, 0x888888 );
-				clearColor = 0xaaaaaa;
+			case 'css/dglux.css':
+				sceneHelpers.remove( grid );
+				grid = new THREE.GridHelper( 30, 60, 0x444444, 0x888888 );
+				sceneHelpers.add( grid );
 				break;
 			case 'css/dark.css':
-				grid.setColors( 0xbbbbbb, 0x888888 );
-				clearColor = 0x333333;
+				sceneHelpers.remove( grid );
+				grid = new THREE.GridHelper( 30, 60, 0xbbbbbb, 0x888888 );
+				sceneHelpers.add( grid );
 				break;
 
 		}
-
-		renderer.setClearColor( clearColor );
 
 		render();
 
@@ -306,11 +341,23 @@ var Viewport = function ( editor ) {
 
 		renderer.autoClear = false;
 		renderer.autoUpdateScene = false;
-		renderer.setClearColor( clearColor );
 		renderer.setPixelRatio( window.devicePixelRatio );
 		renderer.setSize( container.dom.offsetWidth, container.dom.offsetHeight );
 
 		container.dom.appendChild( renderer.domElement );
+
+		if ( WEBVR.isAvailable() === true ) {
+
+			vrControls = new THREE.VRControls( vrCamera );
+			vrEffect = new THREE.VREffect( renderer );
+
+			window.addEventListener( 'vrdisplaypresentchange', function ( event ) {
+
+				effect.isPresenting ? signals.enteredVR.dispatch() : signals.exitedVR.dispatch();
+
+			}, false );
+
+		}
 
 		render();
 
@@ -337,10 +384,11 @@ var Viewport = function ( editor ) {
 
 		if ( object !== null ) {
 
-			if ( object.geometry !== undefined &&
-				 object instanceof THREE.Sprite === false ) {
+			box.setFromObject( object );
 
-				selectionBox.update( object );
+			if ( box.isEmpty() === false ) {
+
+				selectionBox.update( box );
 				selectionBox.visible = true;
 
 			}
@@ -359,9 +407,13 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.geometryChanged.add( function ( geometry ) {
+	signals.geometryChanged.add( function ( object ) {
 
-		selectionBox.update( editor.selected );
+		if ( object !== undefined ) {
+
+			selectionBox.update( object );
+
+		}
 
 		render();
 
@@ -369,24 +421,22 @@ var Viewport = function ( editor ) {
 
 	signals.objectAdded.add( function ( object ) {
 
-		var materialsNeedUpdate = false;
-
 		object.traverse( function ( child ) {
-
-			if ( child instanceof THREE.Light ) materialsNeedUpdate = true;
 
 			objects.push( child );
 
 		} );
 
-		if ( materialsNeedUpdate === true ) updateMaterials();
-
 	} );
 
 	signals.objectChanged.add( function ( object ) {
 
-		selectionBox.update( object );
-		transformControls.update();
+		if ( editor.selected === object ) {
+
+			selectionBox.update( object );
+			transformControls.update();
+
+		}
 
 		if ( object instanceof THREE.PerspectiveCamera ) {
 
@@ -406,17 +456,11 @@ var Viewport = function ( editor ) {
 
 	signals.objectRemoved.add( function ( object ) {
 
-		var materialsNeedUpdate = false;
-
 		object.traverse( function ( child ) {
-
-			if ( child instanceof THREE.Light ) materialsNeedUpdate = true;
 
 			objects.splice( objects.indexOf( child ), 1 );
 
 		} );
-
-		if ( materialsNeedUpdate === true ) updateMaterials();
 
 	} );
 
@@ -438,27 +482,50 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.fogTypeChanged.add( function ( fogType ) {
+	// fog
 
-		if ( fogType !== oldFogType ) {
+	signals.sceneBackgroundChanged.add( function ( backgroundColor ) {
 
-			if ( fogType === "None" ) {
+		scene.background.setHex( backgroundColor );
 
-				scene.fog = null;
+		render();
 
-			} else if ( fogType === "Fog" ) {
+	} );
 
-				scene.fog = new THREE.Fog( oldFogColor, oldFogNear, oldFogFar );
+	var currentFogType = null;
 
-			} else if ( fogType === "FogExp2" ) {
+	signals.sceneFogChanged.add( function ( fogType, fogColor, fogNear, fogFar, fogDensity ) {
 
-				scene.fog = new THREE.FogExp2( oldFogColor, oldFogDensity );
+		if ( currentFogType !== fogType ) {
+
+			switch ( fogType ) {
+
+				case 'None':
+					scene.fog = null;
+					break;
+				case 'Fog':
+					scene.fog = new THREE.Fog();
+					break;
+				case 'FogExp2':
+					scene.fog = new THREE.FogExp2();
+					break;
 
 			}
 
-			updateMaterials();
+			currentFogType = fogType;
 
-			oldFogType = fogType;
+		}
+
+		if ( scene.fog instanceof THREE.Fog ) {
+
+			scene.fog.color.setHex( fogColor );
+			scene.fog.near = fogNear;
+			scene.fog.far = fogFar;
+
+		} else if ( scene.fog instanceof THREE.FogExp2 ) {
+
+			scene.fog.color.setHex( fogColor );
+			scene.fog.density = fogDensity;
 
 		}
 
@@ -466,29 +533,14 @@ var Viewport = function ( editor ) {
 
 	} );
 
-	signals.fogColorChanged.add( function ( fogColor ) {
-
-		oldFogColor = fogColor;
-
-		updateFog( scene );
-
-		render();
-
-	} );
-
-	signals.fogParametersChanged.add( function ( near, far, density ) {
-
-		oldFogNear = near;
-		oldFogFar = far;
-		oldFogDensity = density;
-
-		updateFog( scene );
-
-		render();
-
-	} );
+	//
 
 	signals.windowResize.add( function () {
+
+		// TODO: Move this out?
+
+		editor.DEFAULT_CAMERA.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
+		editor.DEFAULT_CAMERA.updateProjectionMatrix();
 
 		camera.aspect = container.dom.offsetWidth / container.dom.offsetHeight;
 		camera.updateProjectionMatrix();
@@ -507,50 +559,6 @@ var Viewport = function ( editor ) {
 	} );
 
 	//
-
-	var renderer = null;
-
-	animate();
-
-	//
-
-	function updateMaterials() {
-
-		editor.scene.traverse( function ( node ) {
-
-			if ( node.material ) {
-
-				node.material.needsUpdate = true;
-
-				if ( node.material instanceof THREE.MeshFaceMaterial ) {
-
-					for ( var i = 0; i < node.material.materials.length; i ++ ) {
-
-						node.material.materials[ i ].needsUpdate = true;
-
-					}
-
-				}
-
-			}
-
-		} );
-
-	}
-
-	function updateFog( root ) {
-
-		if ( root.fog ) {
-
-			root.fog.color.setHex( oldFogColor );
-
-			if ( root.fog.near !== undefined ) root.fog.near = oldFogNear;
-			if ( root.fog.far !== undefined ) root.fog.far = oldFogFar;
-			if ( root.fog.density !== undefined ) root.fog.density = oldFogDensity;
-
-		}
-
-	}
 
 	function animate() {
 
@@ -576,11 +584,14 @@ var Viewport = function ( editor ) {
 
 			}
 
+		}
+		*/
+
+		if ( vrEffect && vrEffect.isPresenting ) {
+
 			render();
 
 		}
-
-		*/
 
 	}
 
@@ -589,17 +600,32 @@ var Viewport = function ( editor ) {
 		sceneHelpers.updateMatrixWorld();
 		scene.updateMatrixWorld();
 
-		renderer.clear();
-		renderer.render( scene, camera );
+		if ( vrEffect && vrEffect.isPresenting ) {
 
-		if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+			vrControls.update();
 
-			renderer.render( sceneHelpers, camera );
+			camera.updateMatrixWorld();
+
+			vrEffect.render( scene, vrCamera );
+			vrEffect.render( sceneHelpers, vrCamera );
+
+		} else {
+
+			renderer.render( scene, camera );
+
+			if ( renderer instanceof THREE.RaytracingRenderer === false ) {
+
+				renderer.render( sceneHelpers, camera );
+
+			}
 
 		}
 
+
 	}
+
+	requestAnimationFrame( animate );
 
 	return container;
 
-}
+};

@@ -2,35 +2,33 @@
  * @author mrdoob / http://mrdoob.com/
  */
 
-var Config = function () {
-
-	var name = 'threejs-editor';
+var Config = function ( name ) {
 
 	var storage = {
 		'autosave': true,
-		'theme': 'css/visualizer.css',
+		'theme': 'css/light.css',
 
 		'project/renderer': 'WebGLRenderer',
 		'project/renderer/antialias': true,
+		'project/renderer/gammaInput': false,
+		'project/renderer/gammaOutput': false,
 		'project/renderer/shadows': true,
+		'project/editable': false,
 		'project/vr': false,
 		'project/orbit': false,
 
-		'ui/sidebar/animation/collapsed': true,
-		'ui/sidebar/geometry/collapsed': true,
-		'ui/sidebar/material/collapsed': true,
-		'ui/sidebar/object3d/collapsed': false,
-		'ui/sidebar/project/collapsed': true,
-		'ui/sidebar/scene/collapsed': false,
-		'ui/sidebar/script/collapsed': true,
+		'settings/history': false,
 
+		'ui/sidebar/animation/collapsed': true,
+		'ui/sidebar/script/collapsed': true,
+		
 		'ui/sidebar/data/collapsed': true,
 		'ui/sidebar/data/params': {},
 		'ui/sidebar/project/name': 'three.js',
 		'ui/sidebar/data/name': 'three',
-
+		
 		'ui/sidebar/global_scripts/collapsed': true,
-		'ui/sidebar/global_scripts/scripts': [],
+		'ui/sidebar/global_scripts/scripts': []
 	};
 
 	if ( window.localStorage[ name ] === undefined ) {
@@ -58,6 +56,7 @@ var Config = function () {
 		},
 
 		setKey: function () { // key, value, key, value ...
+
 			for ( var i = 0, l = arguments.length; i < l; i += 2 ) {
 
 				storage[ arguments[ i ] ] = arguments[ i + 1 ];
@@ -76,6 +75,6 @@ var Config = function () {
 
 		}
 
-	}
+	};
 
 };

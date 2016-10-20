@@ -11,15 +11,15 @@
 
 		<script src="js/libs/three.min.js"></script>
 		<script src="js/libs/system.min.js"></script>
-
+		
 		<script>
 			// fix for ui-builder
 			window.module = {};
 		</script>
-
+		
 		<script src="js/libs/react-lite.min.js"></script>
 		<script src="ui-builder/react/core.js"></script>
-
+		
 		<script>
 			// ui-builder
 			window.R = window.module.exports(React, false).R;
@@ -33,12 +33,16 @@
 		<script src="js/loaders/AMFLoader.js"></script>
 		<script src="js/loaders/AWDLoader.js"></script>
 		<script src="js/loaders/BabylonLoader.js"></script>
-		<script src="js/loaders/ColladaLoader.js"></script>
+		<script src="js/loaders/ColladaLoader2.js"></script>
+		<script src="js/loaders/FBXLoader.js"></script>
+		<script src="js/loaders/GLTFLoader.js"></script>
 		<script src="js/loaders/KMZLoader.js"></script>
 		<script src="js/loaders/MD2Loader.js"></script>
 		<script src="js/loaders/OBJLoader.js"></script>
+		<script src="js/loaders/PlayCanvasLoader.js"></script>
 		<script src="js/loaders/PLYLoader.js"></script>
 		<script src="js/loaders/STLLoader.js"></script>
+		<script src="js/loaders/TGALoader.js"></script>
 		<script src="js/loaders/UTF8Loader.js"></script>
 		<script src="js/loaders/VRMLLoader.js"></script>
 		<script src="js/loaders/VTKLoader.js"></script>
@@ -57,13 +61,12 @@
 		<link rel="stylesheet" href="js/libs/codemirror/codemirror.css">
 		<link rel="stylesheet" href="js/libs/codemirror/theme/monokai.css">
 		<script src="js/libs/codemirror/codemirror.js"></script>
-
 		<script src="js/libs/codemirror/mode/javascript.js"></script>
+		<script src="js/libs/codemirror/mode/glsl.js"></script>
+
 		<script src="js/libs/esprima.js"></script>
 		<script src="js/libs/jsonlint.js"></script>
 		<script src="js/libs/glslprep.min.js"></script>
-
-		<script src="js/libs/codemirror/mode/glsl.js"></script>
 
 		<link rel="stylesheet" href="js/libs/codemirror/addon/dialog.css">
 		<link rel="stylesheet" href="js/libs/codemirror/addon/show-hint.css">
@@ -83,7 +86,6 @@
 		<script src="js/libs/ternjs/doc_comment.js"></script>
 		<script src="js/libs/tern-threejs/threejs.js"></script>
 
-		<script src="js/libs/sortable.min.js"></script>
 		<script src="js/libs/signals.min.js"></script>
 		<script src="js/libs/ui.js"></script>
 		<script src="js/libs/ui.three.js"></script>
@@ -96,6 +98,7 @@
 		<script src="js/effects/VREffect.js"></script>
 		<script src="js/controls/VRControls.js"></script>
 		<script src="js/controls/OrbitControls.js"></script>
+		<script src="js/vr/WebVR.js"></script>
 
 		<script src="js/Storage.js"></script>
 
@@ -109,15 +112,16 @@
 		<script src="js/Menubar.Add.js"></script>
 		<script src="js/Menubar.Play.js"></script>
 		<script src="js/Menubar.View.js"></script>
-		<script src="js/Menubar.Examples.js"></script>
+		<!-- <script src="js/Menubar.Examples.js"></script> -->
 		<script src="js/Menubar.Help.js"></script>
 		<script src="js/Menubar.Status.js"></script>
 		<script src="js/Sidebar.js"></script>
+		<script src="js/Sidebar.Scene.js"></script>
 		<script src="js/Sidebar.Project.js"></script>
 		<script src="js/Sidebar.Data.js"></script>
-		<script src="js/Sidebar.Scene.js"></script>
-		<script src="js/Sidebar.Object3D.js"></script>
-		<script src="js/Sidebar.Animation.js"></script>
+		<script src="js/Sidebar.Settings.js"></script>
+		<script src="js/Sidebar.Properties.js"></script>
+		<script src="js/Sidebar.Object.js"></script>
 		<script src="js/Sidebar.Geometry.js"></script>
 		<script src="js/Sidebar.Geometry.Geometry.js"></script>
 		<script src="js/Sidebar.Geometry.BufferGeometry.js"></script>
@@ -132,18 +136,48 @@
 		<script src="js/Sidebar.Geometry.TorusKnotGeometry.js"></script>
 		<script src="js/geometries/TeapotBufferGeometry.js"></script>
 		<script src="js/Sidebar.Geometry.TeapotBufferGeometry.js"></script>
+		<script src="js/Sidebar.Geometry.LatheGeometry.js"></script>
 		<script src="js/Sidebar.Material.js"></script>
+		<script src="js/Sidebar.Animation.js"></script>
 		<script src="js/Sidebar.Script.js"></script>
 		<script src="js/Sidebar.GlobalScripts.js"></script>
+		<script src="js/Sidebar.History.js"></script>
 		<script src="js/Toolbar.js"></script>
 		<script src="js/Viewport.js"></script>
 		<script src="js/Viewport.Info.js"></script>
+
+		<script src="js/Command.js"></script>
+		<script src="js/commands/AddObjectCommand.js"></script>
+		<script src="js/commands/RemoveObjectCommand.js"></script>
+		<script src="js/commands/MoveObjectCommand.js"></script>
+		<script src="js/commands/SetPositionCommand.js"></script>
+		<script src="js/commands/SetRotationCommand.js"></script>
+		<script src="js/commands/SetScaleCommand.js"></script>
+		<script src="js/commands/SetValueCommand.js"></script>
+		<script src="js/commands/SetUuidCommand.js"></script>
+		<script src="js/commands/SetColorCommand.js"></script>
+		<script src="js/commands/SetGeometryCommand.js"></script>
+		<script src="js/commands/SetGeometryValueCommand.js"></script>
+		<script src="js/commands/MultiCmdsCommand.js"></script>
+		<script src="js/commands/AddScriptCommand.js"></script>
+		<script src="js/commands/RemoveScriptCommand.js"></script>
+		<script src="js/commands/SetScriptValueCommand.js"></script>
+		<script src="js/commands/SetMaterialCommand.js"></script>
+		<script src="js/commands/SetMaterialValueCommand.js"></script>
+		<script src="js/commands/SetMaterialColorCommand.js"></script>
+		<script src="js/commands/SetMaterialMapCommand.js"></script>
+		<script src="js/commands/SetSceneCommand.js"></script>
+
+		<!-- <script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="qyqgfqd9j8z890t"></script> -->
+
+		<script src="js/libs/html2canvas.js"></script>
+		<script src="js/libs/three.html.js"></script>
 
 		<script>
 
 			window.URL = window.URL || window.webkitURL;
 			window.BlobBuilder = window.BlobBuilder || window.WebKitBlobBuilder || window.MozBlobBuilder;
-
+			
 			window.isThreeEditor = true;
 
 			Number.prototype.format = function (){
@@ -157,11 +191,11 @@
 			var viewport = new Viewport( editor );
 			document.body.appendChild( viewport.dom );
 
-			var player = new Player( editor );
-			document.body.appendChild( player.dom );
-
 			var script = new Script( editor );
 			document.body.appendChild( script.dom );
+
+			var player = new Player( editor );
+			document.body.appendChild( player.dom );
 
 			var toolbar = new Toolbar( editor );
 			document.body.appendChild( toolbar.dom );
@@ -182,6 +216,8 @@
 			editor.storage.init( function () {
 
 				editor.storage.get( function ( state ) {
+
+					if ( isLoadingFromHash ) return;
 
 					if ( state !== undefined ) {
 
@@ -236,8 +272,11 @@
 				signals.objectChanged.add( saveState );
 				signals.objectRemoved.add( saveState );
 				signals.materialChanged.add( saveState );
+				signals.sceneBackgroundChanged.add( saveState );
+				signals.sceneFogChanged.add( saveState );
 				signals.sceneGraphChanged.add( saveState );
 				signals.scriptChanged.add( saveState );
+				signals.historyChanged.add( saveState );
 
 				signals.showModal.add( function ( content ) {
 
@@ -272,16 +311,50 @@
 
 				switch ( event.keyCode ) {
 
-					case 8:
+					case 8: // backspace
+
 						event.preventDefault(); // prevent browser back
+
+					case 46: // delete
 
 						var object = editor.selected;
 
 						if ( confirm( 'Delete ' + object.name + '?' ) === false ) return;
 
 						var parent = object.parent;
-						editor.removeObject( object );
-						editor.select( parent );
+						if ( parent !== null ) editor.execute( new RemoveObjectCommand( object ) );
+
+						break;
+
+					case 90: // Register Ctrl-Z for Undo, Ctrl-Shift-Z for Redo
+
+						if ( event.ctrlKey && event.shiftKey ) {
+
+							editor.redo();
+
+						} else if ( event.ctrlKey ) {
+
+							editor.undo();
+
+						}
+
+						break;
+
+					case 87: // Register W for translation transform mode
+
+						editor.signals.transformModeChanged.dispatch( 'translate' );
+
+						break;
+
+					case 69: // Register E for rotation transform mode
+
+						editor.signals.transformModeChanged.dispatch( 'rotate' );
+
+						break;
+
+					case 82: // Register R for scaling transform mode
+
+						editor.signals.transformModeChanged.dispatch( 'scale' );
 
 						break;
 
@@ -301,13 +374,12 @@
 
 			//
 
-			var file = null;
+			var isLoadingFromHash = false;
 			var hash = window.location.hash;
 
-			if ( hash.substr( 1, 4 ) === 'app=' ) file = hash.substr( 5 );
-			if ( hash.substr( 1, 6 ) === 'scene=' ) file = hash.substr( 7 );
+			if ( hash.substr( 1, 5 ) === 'file=' ) {
 
-			if ( file !== null ) {
+				var file = hash.substr( 6 );
 
 				if ( confirm( 'Any unsaved data will be lost. Are you sure?' ) ) {
 
@@ -315,27 +387,73 @@
 					loader.crossOrigin = '';
 					loader.load( file, function ( text ) {
 
-						var json = JSON.parse( text );
-
 						editor.clear();
-						editor.fromJSON( json );
+						editor.fromJSON( JSON.parse( text ) );
 
 					} );
+
+					isLoadingFromHash = true;
 
 				}
 
 			}
 
+			/*
 			window.addEventListener( 'message', function ( event ) {
-				if(event.data.dgIframe || event.data.dgIframeInit || event.data.dgIframeUpdate || event.data.dgIframe)
-					return;
 
 				editor.clear();
 				editor.fromJSON( event.data );
 
 			}, false );
-
+			*/
+			
 			dgframe.foreign.init();
+
+			// VR
+
+			var groupVR;
+
+			// TODO: Use editor.signals.enteredVR (WebVR 1.0)
+
+			editor.signals.enterVR.add( function () {
+
+				if ( groupVR === undefined ) {
+
+					groupVR = new THREE.HTMLGroup( viewport.dom );
+					editor.sceneHelpers.add( groupVR );
+
+					var mesh = new THREE.HTMLMesh( sidebar.dom );
+					mesh.position.set( 15, 0, 15 );
+					mesh.rotation.y = - 0.5;
+					groupVR.add( mesh );
+
+					var signals = editor.signals;
+
+					function updateTexture() {
+
+						mesh.material.map.update();
+
+					}
+
+					signals.objectSelected.add( updateTexture );
+					signals.objectAdded.add( updateTexture );
+					signals.objectChanged.add( updateTexture );
+					signals.objectRemoved.add( updateTexture );
+					signals.sceneGraphChanged.add( updateTexture );
+					signals.historyChanged.add( updateTexture );
+
+				}
+
+				groupVR.visible = true;
+
+			} );
+
+			editor.signals.exitedVR.add( function () {
+
+				if ( groupVR !== undefined ) groupVR.visible = false;
+
+			} );
+
 		</script>
 	</body>
 </html>

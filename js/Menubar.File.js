@@ -18,7 +18,7 @@ Menubar.File = function ( editor ) {
 
 	// New
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'New' );
 	option.onClick( function () {
@@ -46,7 +46,7 @@ Menubar.File = function ( editor ) {
 
 	} );
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Import' );
 	option.onClick( function () {
@@ -59,14 +59,13 @@ Menubar.File = function ( editor ) {
 	//
 
 	options.add( new UI.HorizontalRule() );
-
+	
 	// Export JSON
 
 	var option = new UI.Panel();
 	option.setClass( 'option' );
 	option.setTextContent( 'Export JSON' );
 	option.onClick( function () {
-
 		var output = editor.toJSON();
 
 		try {
@@ -76,22 +75,25 @@ Menubar.File = function ( editor ) {
 			output = JSON.stringify( output );
 		}
 
-		exportString( output, 'scene.json' );
-
+		saveString( output, 'scene.json' );
 	} );
 	options.add( option );
 
+	//
+
+	options.add( new UI.HorizontalRule() );
+
 	// Publish
 
-	var option = new UI.Panel();
+	var option = new UI.Row();
 	option.setClass( 'option' );
 	option.setTextContent( 'Publish' );
 	option.onClick( function () {
 
-		var camera = editor.camera;
-
 		var zip = new JSZip();
 
+		//
+		
 		var params = editor.config.getKey('ui/sidebar/data/params');
 		var values = [];
 
@@ -114,53 +116,13 @@ Menubar.File = function ( editor ) {
 			callback: zip.file.bind(zip)
 		});
 
-		zip.file(projectName + '/assets/index.html', [
-
-			'<!DOCTYPE html>',
-			'<html lang="en">',
-			'	<head>',
-			'		<title>three.js</title>',
-			'		<meta charset="utf-8">',
-			'		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">',
-			'		<style>',
-			'		body {',
-			'			margin: 0px;',
-			'			overflow: hidden;',
-			'		}',
-			'		</style>',
-			'	</head>',
-			'	<body ontouchstart="">',
-			'		<script src="js/three.min.js"></script>',
-			'		<script src="js/orbit.js"></script>',
-			'		<script src="js/app.js"></script>',
-			' 	<script src="js/dgframe.js"></script>',
-			'		<script>',
-			'',
-			'			var loader = new THREE.XHRLoader();',
-			'			loader.load( \'' + symbolName + '.json\', function ( text ) {',
-			'',
-			'				var player = new APP.Player();',
-			'				player.load( JSON.parse( text ) );',
-			'				player.setSize( window.innerWidth, window.innerHeight );',
-			'				player.play();',
-			'',
-			'				document.body.appendChild( player.dom );',
-			'',
-			'				window.addEventListener( \'resize\', function () {',
-			'					player.setSize( window.innerWidth, window.innerHeight );',
-			'				} );',
-			'',
-			'			} );',
-			'',
-			'		</script>',
-			'	</body>',
-			'</html>'
-
-		].join( '\n' ) );
-
-		//
-
 		var output = editor.toJSON();
+		output.metadata.type = 'App';
+		delete output.history;
+
+		var vr = output.project.vr;
+		var orbit = output.project.orbit;
+
 		output = JSON.stringify( output, null, '\t' );
 		output = output.replace( /[\n\t]+([\d\.e\-\[\]]+)/g, '$1' );
 
@@ -170,33 +132,100 @@ Menubar.File = function ( editor ) {
 
 		var manager = new THREE.LoadingManager( function () {
 
-			location.href = 'data:application/zip;base64,' + zip.generate();
+			save( zip.generate( { type: 'blob' } ), 'download.zip' );
 
 		} );
 
 		var loader = new THREE.XHRLoader( manager );
-		loader.load( 'js/libs/app.js', function ( content ) {
+		loader.load( 'js/libs/app/index.html', function ( content ) {
 
-			zip.file(projectName + '/assets/js/app.js', content );
+			var includes = [];
+
+			if ( vr ) {
+
+				includes.push( '<script src="js/VRControls.js"></script>' );
+				includes.push( '<script src="js/VREffect.js"></script>' );
+				includes.push( '<script src="js/WebVR.js"></script>' );
+
+			}
+			
+			if (orbit) {
+				includes.push('<script src="js/OrbitControls.js"></script>')
+			}
+
+			content = content.replace( '<!-- includes -->', includes.join( '\n\t\t' ) );
+			
+			content = content.replace('<!-- symbolName -->', symbolName);
+
+			zip.file(projectName + '/assets/index.html', content );
 
 		} );
+		loader.load( 'js/libs/app.js', function ( content ) {
 
-		loader.load( 'js/libs/three.min.js', function ( content ) {
+			zip.file( projectName + '/assets/js/app.js', content );
+
+		} );
+		
+		loader.load('dgframe/index.js', function(content) {
+			zip.file(projectName + '/assets/js/dgframe.js', content);
+		});
+		
+		loader.load( '../build/three.min.js', function ( content ) {
 
 			zip.file(projectName + '/assets/js/three.min.js', content );
 
 		} );
 
-		loader.load('js/controls/OrbitControls.js', function(content) {
-			zip.file(projectName + '/assets/js/orbit.js', content);
-		});
+		if ( vr ) {
 
-		loader.load('dgframe/index.js', function(content) {
-			zip.file(projectName + '/assets/js/dgframe.js', content);
-		});
+			loader.load( 'js/controls/VRControls.js', function ( content ) {
+
+				zip.file(projectName + '/assets/js/VRControls.js', content );
+
+			} );
+
+			loader.load( '.js/effects/VREffect.js', function ( content ) {
+
+				zip.file(projectName + '/assets/js/VREffect.js', content );
+
+			} );
+
+			loader.load( 'js/WebVR.js', function ( content ) {
+
+				zip.file(projectName + '/assets/js/WebVR.js', content );
+
+			} );
+
+		}
+		
+		if (orbit) {
+			loader.load('js/controls/OrbitControls.js', function(content) {
+				zip.file(projectName + '/assets/js/OrbitControls.js', content);
+			})
+		}
 
 	} );
 	options.add( option );
+
+	/*
+	// Publish (Dropbox)
+
+	var option = new UI.Row();
+	option.setClass( 'option' );
+	option.setTextContent( 'Publish (Dropbox)' );
+	option.onClick( function () {
+
+		var parameters = {
+			files: [
+				{ 'url': 'data:text/plain;base64,' + window.btoa( "Hello, World" ), 'filename': 'app/test.txt' }
+			]
+		};
+
+		Dropbox.save( parameters );
+
+	} );
+	options.add( option );
+	*/
 
 
 	//
@@ -205,23 +234,21 @@ Menubar.File = function ( editor ) {
 	link.style.display = 'none';
 	document.body.appendChild( link ); // Firefox workaround, see #6594
 
-	var exportString = function ( output, filename ) {
+	function save( blob, filename ) {
 
-		var blob = new Blob( [ output ], { type: 'text/plain' } );
-		var objectURL = URL.createObjectURL( blob );
-
-		link.href = objectURL;
+		link.href = URL.createObjectURL( blob );
 		link.download = filename || 'data.json';
-		link.target = '_blank';
+		link.click();
 
-		var event = document.createEvent("MouseEvents");
-		event.initMouseEvent(
-			"click", true, false, window, 0, 0, 0, 0, 0
-			, false, false, false, false, 0, null
-		);
-		link.dispatchEvent(event);
+		// URL.revokeObjectURL( url ); breaks Firefox...
 
-	};
+	}
+
+	function saveString( text, filename ) {
+
+		save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+	}
 
 	return container;
 
